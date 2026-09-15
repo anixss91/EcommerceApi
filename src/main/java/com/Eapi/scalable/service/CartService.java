@@ -30,10 +30,10 @@ public Cart getCartById(Long id) {
    return cartRepo.findById(id).orElseThrow(() -> new RuntimeException("Cart not found!"));
 }
 
-public Cart addItemToCart(Long userId , Long productId, int quantity) {
-    User user = userRepo.findById(userId).orElseThrow(() -> new RuntimeException("user not found"));
+public Cart addItemToCart(String email, Long productId, int quantity) {
+    User user = userRepo.findByEmail(email).orElseThrow(() -> new RuntimeException("user not found"));
     //orElseGet(() -> ...) — only executes the code inside when the Optional IS empty. It's lazy — it only runs when needed.
-    Cart cart = cartRepo.findByUser_Id(userId).orElseGet(()-> {
+    Cart cart = cartRepo.findByUser_Id(user.getId()).orElseGet(()-> {
         Cart newCart = new Cart();
         newCart.setUser(user);
         return cartRepo.save(newCart);
@@ -51,6 +51,7 @@ public Cart addItemToCart(Long userId , Long productId, int quantity) {
     }else {
         //create new cart item
         CartItem cartItem = new CartItem();
+
         cartItem.setCart(cart);
         cartItem.setProduct(product);
         cartItem.setQuantity(quantity);
@@ -58,5 +59,28 @@ public Cart addItemToCart(Long userId , Long productId, int quantity) {
     }
     return cart;
 }
+
+public Cart getCartByUserEmail(String email) {
+    User user = userRepo.findByEmail(email).orElseThrow(() -> new RuntimeException("user not found"));
+    return cartRepo.findByUser_Id(user.getId()).orElseThrow(() -> new RuntimeException("cart not found!"));
+}
+
+public void updateCartIemQuantity(Long cardItemId , int quantity){
+  cartItemRepo.findById(cardItemId).ifPresent(cartItem -> {
+      cartItem.setQuantity(quantity);
+      cartItemRepo.save(cartItem);
+  });
+}
+
+public void removeItemFromCart(Long cartItemId){
+    cartItemRepo.deleteById(cartItemId);
+
+}
+    public void clearCart(String email){
+    User user = userRepo.findByEmail(email).orElseThrow(() -> new RuntimeException("user not found"));
+    cartRepo.findByUser_Id(user.getId()).ifPresent(cart -> {
+        cartItemRepo.deleteAllByCart_Id(cart.getId());
+    });
+    }
 
 }
