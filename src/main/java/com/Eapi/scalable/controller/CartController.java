@@ -22,7 +22,7 @@ public class CartController {
     }
 
     @PostMapping("/add/{productId}")
-    public Cart addItemToCart( @PathVariable Long productId , int quantity){
+    public Cart addItemToCart( @PathVariable Long productId ,@RequestParam int  quantity){
         return cartService.addItemToCart(getCurrentUserEmail() , productId , quantity);
     }
 
@@ -31,7 +31,7 @@ public class CartController {
       return   cartService.getCartByUserEmail(getCurrentUserEmail());
     }
 
-    @PutMapping("/cart/{cartItemId}")
+    @PutMapping("/{cartItemId}")
     public void updateCaryItemQuantity(@PathVariable Long cartItemId , int quantity){
         cartService.updateCartIemQuantity(cartItemId, quantity);
     }
@@ -41,7 +41,7 @@ public class CartController {
         cartService.removeItemFromCart(cartItemId);
     }
 
-    @DeleteMapping("/cart/{userId}")
+    @DeleteMapping("/clear")
     public void deleteCartByUserId(){
         cartService.clearCart(getCurrentUserEmail());
     }

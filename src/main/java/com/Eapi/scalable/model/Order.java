@@ -3,6 +3,8 @@ package com.Eapi.scalable.model;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "orders")
@@ -15,7 +17,8 @@ public class Order {
     private double totalPrice;
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
-    @ManyToOne
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    private List<OrderItem> orderItems;
     @JoinColumn(name ="user_id" )
     private User user;
 
@@ -26,6 +29,13 @@ public class Order {
         this.totalPrice = totalPrice;
         this.user = user;
         this.createdAt = LocalDateTime.now();
+        this.orderItems = new ArrayList<OrderItem>();
+    }
+    public List<OrderItem> getOrderItems() {
+        return orderItems;
+    }
+    public void setOrderItems(List<OrderItem> orderItems) {
+        this.orderItems = orderItems;
     }
     public Long getId() {
         return id;
