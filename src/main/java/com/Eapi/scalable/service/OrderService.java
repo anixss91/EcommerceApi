@@ -86,7 +86,12 @@ public class OrderService {
     }
 
     public Order getOrderById(Long id) {
-        return orderRepo.findById(id).orElse(null);
+        return orderRepo.findById(id).orElseThrow(()->new RuntimeException("order not found"));
+    }
+
+    public List <Order>getOrdersByUserEmail(String email){
+        User user = userRepo.findByEmail(email).orElseThrow(()->new RuntimeException("user not found"));
+        return orderRepo.findByUser_Id(user.getId());
     }
 
 
