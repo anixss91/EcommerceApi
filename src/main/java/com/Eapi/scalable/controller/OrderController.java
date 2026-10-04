@@ -1,8 +1,8 @@
 package com.Eapi.scalable.controller;
 
 import com.Eapi.scalable.model.Order;
-import com.Eapi.scalable.repository.UserRepo;
 import com.Eapi.scalable.service.OrderService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,6 +20,7 @@ public class OrderController {
         }
 
     @PostMapping("/orders/checkout")
+    @Transactional//guarantees that if any step fails, all database changes roll back automatically.
     public Order checkout(){
      return   orderService.checkout(getCurrentUserEmail());
     }
@@ -42,7 +43,7 @@ public class OrderController {
 
 
     @PatchMapping("/orders/{id}/status")
-    @PreAuthorize("hasRole('ADMIN")
+    @PreAuthorize("hasRole('ADMIN')")
     public void updateOrder(@PathVariable Long id, @RequestBody Order order) {
         orderService.updateOrderStatus(id, order.getStatus());
     }
