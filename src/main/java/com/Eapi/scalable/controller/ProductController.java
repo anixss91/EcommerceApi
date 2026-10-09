@@ -1,12 +1,17 @@
 package com.Eapi.scalable.controller;
 
+import com.Eapi.scalable.dto.ProductRequestDTO;
+import com.Eapi.scalable.dto.ProductResponseDTO;
 import com.Eapi.scalable.model.Product;
 import com.Eapi.scalable.repository.ProductRepo;
 import com.Eapi.scalable.service.ProductSevice;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class ProductController {
@@ -14,13 +19,17 @@ public class ProductController {
     private ProductSevice productSevice;
 
     @GetMapping("/products")
-    public List<Product> getProducts() {
-        return productSevice.getAllProducts();
+    public List<ProductResponseDTO> getProducts() {
+        return productSevice.getAllProducts().stream()
+                .map(productSevice::mapToResponseDTO)
+                .collect(Collectors.toList());
+
     }
 
     @GetMapping("/products/{id}ظ")
-    public Product getProduct(@PathVariable Long id) {
-        return productSevice.getProductById(id);
+    public ProductResponseDTO getProduct(@PathVariable Long id) {
+        Product product = productSevice.getProductById(id);
+        return productSevice.mapToResponseDTO(product);
     }
 
     @GetMapping("/products/category/{categoryId}")
@@ -29,8 +38,10 @@ public class ProductController {
     }
 
     @PostMapping("/products")
-    public Product addProduct(@RequestBody Product product) {
-       return productSevice.createProduct(product);
+    @PreAuthorize("hasRole('ADMIN')")
+    public ProductResponseDTO addProduct(@Valid @RequestBody ProductRequestDTO request) {
+        Product savedProduct = productSevice.createProduct(request);
+       return productSevice.mapToResponseDTO(savedProduct);
     }
 
     @PutMapping("/products/{id}")
@@ -39,8 +50,9 @@ public class ProductController {
     }
 
     @DeleteMapping("/products/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteProduct(@PathVariable Long id) {
-        productSevice.deleteProduct(id);
+        productSevice.deleteProductById(id);
     }
 
 }

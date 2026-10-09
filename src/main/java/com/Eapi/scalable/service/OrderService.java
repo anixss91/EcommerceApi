@@ -1,5 +1,9 @@
 package com.Eapi.scalable.service;
 
+import com.Eapi.scalable.dto.OrderItemResponseDTO;
+import com.Eapi.scalable.dto.OrderResponseDTO;
+import com.Eapi.scalable.exception.BadRequestException;
+import com.Eapi.scalable.exception.ResourceNotFountException;
 import com.Eapi.scalable.model.*;
 import com.Eapi.scalable.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class OrderService {
@@ -28,17 +33,17 @@ public class OrderService {
 
     public Order checkout(String email) {
         //1-find the user
-        User user = userRepo.findByEmail(email).orElseThrow(()->new RuntimeException("user not found"));
+        User user = userRepo.findByEmail(email).orElseThrow(()->new ResourceNotFountException("user not found by email "+ email));
 
         //2-find their cart
-        Cart cart = cartRepo.findByUser_Id(user.getId()).orElseThrow(()->new RuntimeException("cart not found"));
+        Cart cart = cartRepo.findByUser_Id(user.getId()).orElseThrow(()->new ResourceNotFountException("cart not found"));
 
         //3-get all itemsof the cart
         List <CartItem> cartItems = cartItemRepo.findByCart_Id(cart.getId());
 
         //4.cant checkout an empty cart
         if(cartItems.isEmpty()){
-            throw new RuntimeException("cart is empty");
+            throw new BadRequestException("cannot checkout with an empty cart");
         }
 
         //5-create new order
@@ -55,7 +60,7 @@ public class OrderService {
 
                 //decrease stock
                 if(product.getStockQuantity()<cartItem.getQuantity()){
-                    throw new RuntimeException("not enough stock for product" + product.getName());
+                    throw new BadRequestException("Insufficient stock for product: " + product.getName());
                 }
                 product.setStockQuantity(product.getStockQuantity() - cartItem.getQuantity());
                 productRepo.save(product);
@@ -108,6 +113,28 @@ public class OrderService {
     public void deleteOrderById(Long id) {
         orderRepo.deleteById(id);
     }
+
+    public OrderResponseDTO mapToOrderResponseDto(Order order){
+        List <OrderItemResponseDTO> itemDTOs = order.getOrderItems().stream()
+                .map(item -> new OrderItemResponseDTO(
+                        item.getId(),
+                        item.getProduct().getId(),
+                        item.getProduct().getName(),
+                        item.getQuantity(),
+                        item.getPrice()
+                ))
+                .collect(Collectors.toList());
+
+        return new OrderResponseDTO(
+                order.getId(),
+                order.getUser().getEmail(),
+                order.getStatus(),
+                order.getTotalPrice(),
+                order.getCreatedAt(),
+                itemDTOs
+        );
+    }
+
 
 }
 

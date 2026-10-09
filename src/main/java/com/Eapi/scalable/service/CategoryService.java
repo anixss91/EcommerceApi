@@ -1,5 +1,7 @@
 package com.Eapi.scalable.service;
 
+import com.Eapi.scalable.dto.CategoryResponseDto;
+import com.Eapi.scalable.exception.ResourceNotFountException;
 import com.Eapi.scalable.model.Category;
 import com.Eapi.scalable.model.Product;
 import com.Eapi.scalable.repository.CategoryRepo;
@@ -15,11 +17,18 @@ public class CategoryService {
     @Autowired
     private CategoryRepo categoryRepo;
 
+    public CategoryResponseDto mapToResponseDTO(Category category){
+        return new CategoryResponseDto(category.getId(), category.getName());
+    }
+    public Category saveCategory(Category category) {
+        return categoryRepo.save(category);
+    }
+
     public List<Category> getAllCategories() {
         return categoryRepo.findAll();
     }
     public Category getCategoryById(Long id) {
-        return categoryRepo.findById(id).orElseThrow(() -> new RuntimeException("Category not found!"));
+        return categoryRepo.findById(id).orElseThrow(() -> new ResourceNotFountException("Category not found!"));
     }
     public Category addCategory(Category category) {
       return  categoryRepo.save(category);

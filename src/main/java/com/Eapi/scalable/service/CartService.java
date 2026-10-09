@@ -1,5 +1,6 @@
 package com.Eapi.scalable.service;
 
+import com.Eapi.scalable.exception.ResourceNotFountException;
 import com.Eapi.scalable.model.Cart;
 import com.Eapi.scalable.model.CartItem;
 import com.Eapi.scalable.model.Product;
@@ -27,11 +28,11 @@ public class CartService {
     @Autowired
     ProductRepo productRepo;
 public Cart getCartById(Long id) {
-   return cartRepo.findById(id).orElseThrow(() -> new RuntimeException("Cart not found!"));
+   return cartRepo.findById(id).orElseThrow(() -> new ResourceNotFountException("Cart not found"));
 }
 
 public Cart addItemToCart(String email, Long productId, int quantity) {
-    User user = userRepo.findByEmail(email).orElseThrow(() -> new RuntimeException("user not found"));
+    User user = userRepo.findByEmail(email).orElseThrow(() -> new ResourceNotFountException("user not found"));
     //orElseGet(() -> ...) — only executes the code inside when the Optional IS empty. It's lazy — it only runs when needed.
     Cart cart = cartRepo.findByUser_Id(user.getId()).orElseGet(()-> {
         Cart newCart = new Cart();
@@ -39,7 +40,7 @@ public Cart addItemToCart(String email, Long productId, int quantity) {
         return cartRepo.save(newCart);
     });
 
-    Product product =productRepo.findById(productId).orElseThrow(() -> new RuntimeException("product not found!"));
+    Product product =productRepo.findById(productId).orElseThrow(() -> new ResourceNotFountException("product not found!"));
 
     Optional <CartItem> existingItem = cartItemRepo.findByCart_IdAndProduct_Id(cart.getId() , productId);
     if(existingItem.isPresent()) {
@@ -61,8 +62,8 @@ public Cart addItemToCart(String email, Long productId, int quantity) {
 }
 
 public Cart getCartByUserEmail(String email) {
-    User user = userRepo.findByEmail(email).orElseThrow(() -> new RuntimeException("user not found"));
-    return cartRepo.findByUser_Id(user.getId()).orElseThrow(() -> new RuntimeException("cart not found!"));
+    User user = userRepo.findByEmail(email).orElseThrow(() -> new ResourceNotFountException("user not found"));
+    return cartRepo.findByUser_Id(user.getId()).orElseThrow(() -> new ResourceNotFountException("cart not found!"));
 }
 
 public void updateCartIemQuantity(Long cardItemId , int quantity){
@@ -77,7 +78,7 @@ public void removeItemFromCart(Long cartItemId){
 
 }
     public void clearCart(String email){
-    User user = userRepo.findByEmail(email).orElseThrow(() -> new RuntimeException("user not found"));
+    User user = userRepo.findByEmail(email).orElseThrow(() -> new ResourceNotFountException("user not found"));
     cartRepo.findByUser_Id(user.getId()).ifPresent(cart -> {
         cartItemRepo.deleteAllByCart_Id(cart.getId());
     });
