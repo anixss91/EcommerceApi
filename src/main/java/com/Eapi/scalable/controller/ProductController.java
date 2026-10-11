@@ -3,7 +3,6 @@ package com.Eapi.scalable.controller;
 import com.Eapi.scalable.dto.ProductRequestDTO;
 import com.Eapi.scalable.dto.ProductResponseDTO;
 import com.Eapi.scalable.model.Product;
-import com.Eapi.scalable.repository.ProductRepo;
 import com.Eapi.scalable.service.ProductSevice;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +25,7 @@ public class ProductController {
 
     }
 
-    @GetMapping("/products/{id}ظ")
+    @GetMapping("/products/{id}")
     public ProductResponseDTO getProduct(@PathVariable Long id) {
         Product product = productSevice.getProductById(id);
         return productSevice.mapToResponseDTO(product);
