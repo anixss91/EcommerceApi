@@ -1,6 +1,7 @@
 package com.Eapi.scalable.controller;
 
 import com.Eapi.scalable.dto.OrderResponseDTO;
+import com.Eapi.scalable.dto.UpdateOrderStatusRequest;
 import com.Eapi.scalable.exception.BadRequestException;
 import com.Eapi.scalable.model.Order;
 import com.Eapi.scalable.service.OrderService;
@@ -53,12 +54,15 @@ public class OrderController {
 
     @PatchMapping("/orders/{id}/status")
     @PreAuthorize("hasRole('ADMIN')")
-    public void updateOrderStatus(@PathVariable Long id, @Valid @RequestBody Order order) {
-        orderService.updateOrderStatus(id, order.getStatus());
+    public void updateOrderStatus(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateOrderStatusRequest request) {
+
+        orderService.updateOrderStatus(id, request.getStatus());
     }
 
     @DeleteMapping("/orders/{id}")
-    @PreAuthorize("hasRole('ADMIN")
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteOrder(@PathVariable Long id) {
         orderService.deleteOrderById(id);
     }

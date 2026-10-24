@@ -35,7 +35,7 @@ public class CategoryController {
     }
 
     @PostMapping("/categories")
-    @PreAuthorize("hasRole('Admin')")
+    @PreAuthorize("hasRole('ADMIN')")
     public CategoryResponseDto addCategory(@Valid  @RequestBody CategoryRequestDto request) {
         Category category = new Category();
         category.setName(request.getName());

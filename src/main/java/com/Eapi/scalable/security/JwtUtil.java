@@ -1,6 +1,7 @@
 package com.Eapi.scalable.security;
 
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -8,14 +9,20 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 
 
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 
 @Component
 public class JwtUtil {
-    private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-    private final long experation = 1000 * 60 * 60 * 24;
 
+    private final Key key;
+    private final long expiration = 1000 * 60 * 60 * 24;
+
+    public JwtUtil(@Value("${jwt.secret}") String secret) {
+        this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+    }
+    private final long experation = 1000 * 60 * 60 * 24;
     public String generateToken(String email) {
         return Jwts.builder()
                 .setSubject(email)

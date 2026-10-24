@@ -20,14 +20,15 @@ public class Product {
     public Product() {
     }
 
-    public Product(Long id, String name, String description, int StockQuantity, double price) {
+    public Product(Long id, String name, String description,
+                   int stockQuantity, double price) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.stockQuantity = stockQuantity;
         this.price = price;
-
     }
+
     public Category getCategory() {
         return category;
     }

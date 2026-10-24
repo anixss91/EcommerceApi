@@ -19,7 +19,8 @@ public class Order {
     private LocalDateTime createdAt = LocalDateTime.now();
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> orderItems;
-    @JoinColumn(name ="user_id" )
+    @ManyToOne                    // ✅ the fix goes HERE
+    @JoinColumn(name = "user_id")
     private User user;
 
     public Order() {}

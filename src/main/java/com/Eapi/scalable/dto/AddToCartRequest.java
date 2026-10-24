@@ -13,7 +13,9 @@ public class AddToCartRequest {
     private Integer quantity;
 
     public Long getProductId() { return productID; }
-    public void setProductId(Long productId) { this.productID = productID; }
+    public void setProductId(Long productId) {
+        this.productID = productId; // Correct: uses the incoming parameter
+    }
 
     public Integer getQuantity() { return quantity; }
     public void setQuantity(Integer quantity) { this.quantity = quantity; }
